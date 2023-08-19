@@ -9,6 +9,7 @@ function App() {
   const [user,setUser] = useState('');
   const [games,setGames] = useState([]);
   const[game,setGame] = useState({});
+  const [ready,setReady] = useState(false);
   // const gamesRef = collection(db,'games');
   // useEffect(() => {
   //   gamesRef
@@ -25,7 +26,7 @@ function App() {
 
   // },[])
   if(user !== ''){
-    if (game !== {}) {
+    if (!ready) {
       return (
         <GameScreen user={user} />
       );
