@@ -36,3 +36,34 @@
     transform: rotate(360deg);
   }
 }
+.userName {
+  color: blue;
+  text-align: left;
+  display: inline;
+  float: left;
+  margin-left: 2%;
+}
+.turn {
+  color: green;
+  text-align: right;
+  display: inline;
+  float: right;
+  margin-right: 2%;
+}
+form {
+  text-align: center;
+}
+table {
+  text-align: center;
+  margin: 0 auto;
+  width: 60%;
+  max-width: 400px;
+  background-color: gray;
+}
+td {
+  border: black solid 1px;
+  border-radius: 2px;
+  font-size: 150%;
+  width: 1em;
+  background-color: white;
+}
