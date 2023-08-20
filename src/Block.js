@@ -1,6 +1,6 @@
 import React,{useEffect, useState} from 'react';
 
-function Block({blocks, index, setBlocks, turn, setWord}) {
+function Block({blocks, index, setBlocks, turn, setWord,players}) {
     const block = blocks[index];
     const {clicked,allegiance} = block;
 
@@ -34,6 +34,17 @@ function Block({blocks, index, setBlocks, turn, setWord}) {
             })
         })
     }
+    const neighborsAre = (neighbors) => {
+        if (neighbors.every((neighbor) => neighbor.allegiance==='blue'|| neighbor.allegiance ==='solidBlue')) {
+            return 'blue';
+        }
+        else if (neighbors.every((neighbor) => neighbor.allegiance==='red'|| neighbor.allegiance ==='solidRed')) {
+            return 'red';
+        }
+        else {
+            return '';
+        }
+    }
     const checkNeighbors = () => {
         const x = (block) => block.index%5;
         const y = (block) => Math.floor(block.index/5);
@@ -43,25 +54,33 @@ function Block({blocks, index, setBlocks, turn, setWord}) {
             return   ((x(potentialNeighbor) == x(block))&&(differenceY == 1)) || ((y(potentialNeighbor)==y(block))&&(differenceX == 1));
         }
         )
-        const neighborsAreBlue = neighbors.every((neighbor) => neighbor.allegiance==='blue' || neighbor.allegiance === 'solidBlue');
-        if(neighborsAreBlue && block.allegiance== 'blue'){
+        const playerColor = turn===players[1]?'blue':'red';
+        const solidColor = turn===players[1]?'solidBlue':'solidRed';
+        const opponentColor = playerColor === 'red'?'blue':'red';
+        const opponentSolidColor = playerColor === 'red'?'solidBlue':'solidRed';
+        const neighborsColor = neighborsAre(neighbors);
+        
+        if(neighborsColor === playerColor && block.allegiance===playerColor){
 
-            changeAllegiance('solidBlue');
+            changeAllegiance(solidColor);
+        }
+        else if (neighborsAre(neighbors) === '' && block.allegiance===opponentSolidColor) {
+            console.log('hello');
+            changeAllegiance(opponentColor);
         }
 
 
     }
     useEffect(() => {
         if(clicked) {
-            changeAllegiance('blue');
+            changeAllegiance(turn===players[1]?'blue':'red');
         }
         setClicked(false);
-        
 
     },[turn])
     useEffect(() => {
         checkNeighbors();
-    },[blocks])
+    },[blocks,turn])
     const handleClick = () => {
         if(turn) {
             if(clicked){

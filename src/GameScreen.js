@@ -1,24 +1,29 @@
 import React,{useEffect, useState} from 'react';
 import './App.css';
 import BlockGrid from './BlockGrid.js';
-import { db} from './firebase.js';
-import { collection , onSnapshot , serverTimestamp, addDoc, query, orderBy} from 'firebase/firestore';
-
-const q=query(collection(db,'games'),orderBy('turn','desc'));
-function GameScreen({user}) {
-  const players = ['Bdude493','Mouseymama']
-  const [turn,setTurn] = useState(user);
+import {addDoc,setDoc, doc,collection} from 'firebase/firestore';
+import {db} from './firebase';
+function GameScreen({user,game,newGame,setGame}) {
+  const [players,setPlayers] = useState(game.players);
+  const [turn,setTurn] = useState(game.turn);
   const [word,setWord] = useState([]);
-  const [usedWords,setUsedWords] = useState([]);
+  const [usedWords,setUsedWords] = useState(game.usedWords);
   const [message,setMessage] = useState('Click on Letters to Form a Word!');
-  const [blocks,setBlocks] = useState([]);
+  const [blocks,setBlocks] = useState(game.blocks);
+  const saveGame = () => {
+      try {
+        setDoc(doc(db,'games',game.id),{blocks,players,turn,usedWords})
+      }
+      catch {
+        console.log('firebase error in setting document');
+      }
+  }
   const endTurn = async () => {
     const stringWord = word.map((block) => block.letter).join('')
     if(await verifyWord(stringWord)){
         setTurn((turn) => turn===players[0]?players[1]:players[0]);
         setUsedWords((prevUsedWords) => [...prevUsedWords,stringWord])
         setWord([]);
-
     }
     else {
         setMessage('That was not a valid word');
@@ -30,6 +35,10 @@ function GameScreen({user}) {
 
         setMessage('Click on Letters to Form a Word');
     }
+    else {
+      setMessage('Waiting for your opponent...');
+    }
+    saveGame();
     
   },[turn])
   async function verifyWord(word) {
@@ -56,8 +65,10 @@ function GameScreen({user}) {
             players={players} 
             usedWords={usedWords}/>
         <h2>{word.map((block) => block.letter).join(' ')}</h2>
-        <button onClick={endTurn}>Submit</button>
+        {turn === user && <button onClick={endTurn}>Submit</button>}
         <h3>{message}</h3>
+        {usedWords.length>0&&<h4>Last Word: {usedWords[usedWords.length-1].toLowerCase()}</h4>}
+        <button onClick={() => setGame({})}>Back to Games</button>
     </div>
   );
 }

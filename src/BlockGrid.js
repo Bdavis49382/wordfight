@@ -1,28 +1,18 @@
 import React,{useEffect, useState} from 'react';
 import './App.css';
 import Block from './Block.js';
-import { collection , onSnapshot , serverTimestamp, addDoc, query, orderBy} from 'firebase/firestore';
-import { db} from './firebase.js';
+// import { collection , onSnapshot , serverTimestamp, addDoc, query, orderBy} from 'firebase/firestore';
+// import { db} from './firebase.js';
 
 function BlockGrid({turn, setWord,blocks,setBlocks,usedWords,players}) {
 
-    const [isBuilt,setIsBuilt] = useState(false);
     useEffect(() => {
-        if(!isBuilt){
+        if(blocks.length === 0){
             const tempBlocks =buildNewGrid() 
             setBlocks(tempBlocks);
-            setIsBuilt(true);
-            addDoc(collection(db,'games'),{
-                    blocks:tempBlocks,
-                    players:players,
-                    turn:turn,
-                    usedWords:usedWords
-        
-            })
-        setIsBuilt(true);
         }
 
-    },[turn])
+    },[])
     const buildNewGrid = () => {
         const newDice = ["AAEEGN","ELRTTY","AOOTTW","ABBJOO","EHRTVW","CIMOTU","DISTTY","EIOSST","DELRVY","ACHOPS","HIMNQU","EEINSU","EEGHNW","AFFKPS","HLNNRZ","DEILRX","AAEEGN","ACHOPS","AFFKPS","DEILRX","DELRVY","EEGHNW","EIOSST","HIMNQU","HLNNRZ",
           ];
@@ -51,8 +41,8 @@ function BlockGrid({turn, setWord,blocks,setBlocks,usedWords,players}) {
         }
         return blockRows.map((row,index) => 
             <tr key={index}>
-                {row.map((block) =>
-                    <Block blocks={blocks} index={block.index} setBlocks={setBlocks} turn={turn} setWord={setWord} />)
+                {row.map((block,index) =>
+                    <Block key={index} blocks={blocks} index={block.index} players={players} setBlocks={setBlocks} turn={turn} setWord={setWord} />)
                 }
             </tr>);
     }
