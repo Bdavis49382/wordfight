@@ -62,9 +62,11 @@ export default function SelectionScreen({games, user,setGame,setGameId}) {
 
    }
    const formatDate = (game) => {
-    const date = game.lastMove.toDate();
-    var time = date.toLocaleTimeString('en-US', { hour12: true });
-    return `Last Move: ${date.getMonth()}/${date.getDate()}/${date.getFullYear()} ${time}` 
+    const date = game.lastMove.toDate().getTime();
+    const now = new Date().getTime();
+    return `Last Move: ${Math.floor((now-date)/36000)} minutes ago`;
+    // var time = date.toLocaleTimeString('en-US', { hour12: true });
+    // return `Last Move: ${date.getMonth()}/${date.getDate()}/${date.getFullYear()} ${time}` 
    }
     return (
         <div>
