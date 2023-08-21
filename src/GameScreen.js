@@ -10,11 +10,16 @@ function GameScreen({user,game,setGameId,gameId}) {
   const [usedWords,setUsedWords] = useState(game.usedWords);
   const [message,setMessage] = useState('Click on Letters to Form a Word!');
   const [blocks,setBlocks] = useState(game.blocks);
+  const [blueScore,setBlueScore] = useState(game.blueScore);
+  const [redScore,setRedScore] = useState(game.redScore);
+  // const [over,setOver] = useState(false);
   const loadGame = () => {
     onSnapshot(doc(db,'games',gameId), (doc) => {
       setTurn(doc.data().turn);
       setUsedWords(doc.data().usedWords);
       setBlocks(doc.data().blocks);
+      setBlueScore(doc.data().blueScore);
+      setRedScore(doc.data().redScore);
     })
   }
     const neighborsAre = (neighbors) => {
@@ -44,17 +49,28 @@ function GameScreen({user,game,setGameId,gameId}) {
         const neighborsColor = neighborsAre(neighbors);
         
         if(neighborsColor === playerColor && block.allegiance===playerColor){
-
           block.allegiance = solidColor;
+          if (playerColor === 'blue') {
+            setBlueScore((score) => score + 1);
+          }
+          else {
+            setRedScore((score) => score + 1);
+          }
         }
-        else if (neighborsColor === '' && block.allegiance===opponentSolidColor) {
+        else if ((neighborsColor === '' || neighborsColor === playerColor) && block.allegiance===opponentSolidColor) {
             block.allegiance = opponentColor;
+            if (playerColor === 'blue') {
+              setRedScore((score) => score -1);
+            }
+            else {
+              setBlueScore((score) => score - 1);
+            }
         }
         return block;
     }
   const saveGame = () => {
       try {
-        setDoc(doc(db,'games',game.id),{blocks,players,turn,usedWords})
+        setDoc(doc(db,'games',game.id),{blocks,players,turn,usedWords,blueScore,redScore})
       }
       catch (err) {
         console.log('firebase error in setting document');
@@ -92,7 +108,10 @@ function GameScreen({user,game,setGameId,gameId}) {
     loadGame();
   },[])
   useEffect(() => {
-    if(turn === user){
+    if (redScore >= 10 || blueScore >= 10) {
+      setMessage('Game Over');
+    }
+    else if(turn === user){
         setMessage('Click on Letters to Form a Word');
     }
     else {
@@ -124,10 +143,15 @@ function GameScreen({user,game,setGameId,gameId}) {
             players={players} 
             usedWords={usedWords}/>
         <h2>{word.map((block) => block.letter).join(' ')}</h2>
-        {turn === user && <button onClick={endTurn}>Submit</button>}
+        {(turn === user && blueScore < 10 && redScore < 10) && <button onClick={endTurn}>Submit</button>}
         <h3>{message}</h3>
         {usedWords.length>0&&<h4>Last Word: {usedWords[usedWords.length-1].toLowerCase()}</h4>}
         <button onClick={() => setGameId('')}>Back to Games</button>
+        <p>Score</p>
+        <p style={{color:'blue'}}>{blueScore}</p>
+        <p style={{color:'red'}}>{redScore}</p>
+        <p>{redScore>=10?"red won":""}</p>
+        <p>{blueScore>=10?"blue won":""}</p>
     </div>
   );
 }
