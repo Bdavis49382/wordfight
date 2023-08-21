@@ -29,6 +29,42 @@ function GameScreen({user,game,newGame,setGame,setGameId,gameId}) {
   //     console.log('error updating blocks');
   //   }
   // }
+    const neighborsAre = (neighbors) => {
+        if (neighbors.every((neighbor) => neighbor.allegiance==='blue'|| neighbor.allegiance ==='solidBlue')) {
+            return 'blue';
+        }
+        else if (neighbors.every((neighbor) => neighbor.allegiance==='red'|| neighbor.allegiance ==='solidRed')) {
+            return 'red';
+        }
+        else {
+            return '';
+        }
+    }
+    const checkNeighbors = (block) => {
+        const x = (otherBlock) => otherBlock.index%5;
+        const y = (otherBlock) => Math.floor(otherBlock.index/5);
+        const neighbors = blocks.filter((potentialNeighbor) => {
+            const differenceY = Math.abs(y(potentialNeighbor)-y(block));
+            const differenceX = Math.abs(x(potentialNeighbor)-x(block));
+            return   ((x(potentialNeighbor) == x(block))&&(differenceY == 1)) || ((y(potentialNeighbor)==y(block))&&(differenceX == 1));
+        }
+        )
+        const playerColor = turn===players[1]?'blue':'red';
+        const solidColor = turn===players[1]?'solidBlue':'solidRed';
+        const opponentColor = playerColor === 'red'?'blue':'red';
+        const opponentSolidColor = playerColor === 'red'?'solidBlue':'solidRed';
+        const neighborsColor = neighborsAre(neighbors);
+        
+        if(neighborsColor === playerColor && block.allegiance===playerColor){
+
+          block.allegiance = solidColor;
+          console.log(block);
+        }
+        else if (neighborsColor === '' && block.allegiance===opponentSolidColor) {
+            block.allegiance = opponentColor;
+        }
+        return block;
+    }
   const saveGame = () => {
       try {
         setDoc(doc(db,'games',game.id),{blocks,players,turn,usedWords})
@@ -44,7 +80,7 @@ function GameScreen({user,game,newGame,setGame,setGameId,gameId}) {
         await setUsedWords((prevUsedWords) => [...prevUsedWords,stringWord])
         setTurn((turn) => turn===players[0]?players[1]:players[0]);
         setWord([]);
-        const newBlocks = colorBlocks();
+        const newBlocks = colorBlocks().map(checkNeighbors);
         updateDoc(doc(db,'games',gameId), {"blocks":newBlocks})
     }
     else {

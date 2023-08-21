@@ -34,42 +34,6 @@ function Block({blocks, index, setBlocks, turn, setWord,players,usedWords}) {
             })
         })
     }
-    const neighborsAre = (neighbors) => {
-        if (neighbors.every((neighbor) => neighbor.allegiance==='blue'|| neighbor.allegiance ==='solidBlue')) {
-            return 'blue';
-        }
-        else if (neighbors.every((neighbor) => neighbor.allegiance==='red'|| neighbor.allegiance ==='solidRed')) {
-            return 'red';
-        }
-        else {
-            return '';
-        }
-    }
-    const checkNeighbors = () => {
-        const x = (otherBlock) => otherBlock.index%5;
-        const y = (otherBlock) => Math.floor(otherBlock.index/5);
-        const neighbors = blocks.filter((potentialNeighbor) => {
-            const differenceY = Math.abs(y(potentialNeighbor)-y(block));
-            const differenceX = Math.abs(x(potentialNeighbor)-x(block));
-            return   ((x(potentialNeighbor) == x(block))&&(differenceY == 1)) || ((y(potentialNeighbor)==y(block))&&(differenceX == 1));
-        }
-        )
-        const playerColor = turn===players[1]?'blue':'red';
-        const solidColor = turn===players[1]?'solidBlue':'solidRed';
-        const opponentColor = playerColor === 'red'?'blue':'red';
-        const opponentSolidColor = playerColor === 'red'?'solidBlue':'solidRed';
-        const neighborsColor = neighborsAre(neighbors);
-        
-        if(neighborsColor === playerColor && block.allegiance===playerColor){
-
-            changeAllegiance(solidColor);
-        }
-        else if (neighborsAre(neighbors) === '' && block.allegiance===opponentSolidColor) {
-            changeAllegiance(opponentColor);
-        }
-
-
-    }
     useEffect(() => {
         const playerColor = turn===players[1]?'blue':'red';
         const solidEnemyColor = turn===players[1]?'solidRed':'solidBlue';
@@ -79,9 +43,9 @@ function Block({blocks, index, setBlocks, turn, setWord,players,usedWords}) {
         setClicked(false);
 
     },[usedWords])
-    useEffect(() => {
-        checkNeighbors();
-    },[blocks,turn])
+    // useEffect(() => {
+    //     checkNeighbors();
+    // },[blocks,turn])
     const handleClick = () => {
         if(turn) {
             if(clicked){
