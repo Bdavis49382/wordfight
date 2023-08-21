@@ -1,9 +1,9 @@
 import React,{useEffect, useState} from 'react';
 import './App.css';
 import BlockGrid from './BlockGrid.js';
-import {getDoc,setDoc, updateDoc,doc,collection, onSnapshot} from 'firebase/firestore';
+import {setDoc, updateDoc,doc, onSnapshot} from 'firebase/firestore';
 import {db} from './firebase';
-function GameScreen({user,game,newGame,setGame,setGameId,gameId}) {
+function GameScreen({user,game,setGameId,gameId}) {
   const [players,setPlayers] = useState(game.players);
   const [turn,setTurn] = useState(game.turn);
   const [word,setWord] = useState([]);
@@ -12,23 +12,11 @@ function GameScreen({user,game,newGame,setGame,setGameId,gameId}) {
   const [blocks,setBlocks] = useState(game.blocks);
   const loadGame = () => {
     onSnapshot(doc(db,'games',gameId), (doc) => {
-      // console.log('loading game data:');
-      // console.log(doc.data());
-      // setGame(doc.data());
       setTurn(doc.data().turn);
       setUsedWords(doc.data().usedWords);
       setBlocks(doc.data().blocks);
     })
   }
-  // const updateBlocks = async () => {
-  //   const gameDoc = await getDoc(doc(db,'games',gameId));
-  //   if (gameDoc.exists()) {
-  //     setBlocks(gameDoc.data().blocks);
-  //   }
-  //   else {
-  //     console.log('error updating blocks');
-  //   }
-  // }
     const neighborsAre = (neighbors) => {
         if (neighbors.every((neighbor) => neighbor.allegiance==='blue'|| neighbor.allegiance ==='solidBlue')) {
             return 'blue';
@@ -46,7 +34,7 @@ function GameScreen({user,game,newGame,setGame,setGameId,gameId}) {
         const neighbors = blocks.filter((potentialNeighbor) => {
             const differenceY = Math.abs(y(potentialNeighbor)-y(block));
             const differenceX = Math.abs(x(potentialNeighbor)-x(block));
-            return   ((x(potentialNeighbor) == x(block))&&(differenceY == 1)) || ((y(potentialNeighbor)==y(block))&&(differenceX == 1));
+            return   ((x(potentialNeighbor) === x(block))&&(differenceY === 1)) || ((y(potentialNeighbor)===y(block))&&(differenceX === 1));
         }
         )
         const playerColor = turn===players[1]?'blue':'red';
@@ -58,7 +46,6 @@ function GameScreen({user,game,newGame,setGame,setGameId,gameId}) {
         if(neighborsColor === playerColor && block.allegiance===playerColor){
 
           block.allegiance = solidColor;
-          console.log(block);
         }
         else if (neighborsColor === '' && block.allegiance===opponentSolidColor) {
             block.allegiance = opponentColor;
@@ -71,7 +58,6 @@ function GameScreen({user,game,newGame,setGame,setGameId,gameId}) {
       }
       catch (err) {
         console.log('firebase error in setting document');
-        console.log(err)
       }
   }
   const endTurn = async () => {
@@ -90,29 +76,23 @@ function GameScreen({user,game,newGame,setGame,setGameId,gameId}) {
   }
 
   const colorBlocks = () => {
+
+    const solidEnemyColor = turn===players[1]?'solidRed':'solidBlue';
     const newBlocks = blocks.map((block) => {
       const playerColor = turn===players[1]?'blue':'red';
-      if (block.clicked) {
+      if (block.clicked && block.allegiance !== solidEnemyColor) {
         block.allegiance = playerColor;
-        block.clicked = false;
       }
+      block.clicked = false;
       return block;
     })
     return newBlocks;
   }
-  // useEffect(() => {
-  //   updateBlocks();
-  // },[usedWords]);
-  // useEffect(() => {
-  //   saveGame();
-  //   console.log('game saved');
-  // },[blocks])
   useEffect(() => {
     loadGame();
   },[])
   useEffect(() => {
     if(turn === user){
-      // updateBlocks();
         setMessage('Click on Letters to Form a Word');
     }
     else {
@@ -120,13 +100,12 @@ function GameScreen({user,game,newGame,setGame,setGameId,gameId}) {
       setMessage('Waiting for your opponent...');
     }
     
-  },[turn])
+  },[turn,user])
   async function verifyWord(word) {
     
     let url = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
     const response = await fetch(url);
     if (response.ok) {
-        // const data = await response.json();
         return true
     }
     else {

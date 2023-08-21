@@ -35,10 +35,9 @@ function App() {
         <GameScreen 
           user={user} 
           game={game} 
-          newGame={games.filter((eachGame) => game.id === eachGame.id ).length === 0}
           gameId={gameId} 
           setGameId={setGameId} 
-          setGame={setGame}/>
+          />
       );
     }
     else {
