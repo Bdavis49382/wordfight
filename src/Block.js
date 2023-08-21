@@ -1,6 +1,6 @@
 import React,{useEffect, useState} from 'react';
 
-function Block({blocks, index, setBlocks, turn, setWord,players}) {
+function Block({blocks, index, setBlocks, turn, setWord,players,usedWords}) {
     const block = blocks[index];
     const {clicked,allegiance} = block;
 
@@ -46,8 +46,8 @@ function Block({blocks, index, setBlocks, turn, setWord,players}) {
         }
     }
     const checkNeighbors = () => {
-        const x = (block) => block.index%5;
-        const y = (block) => Math.floor(block.index/5);
+        const x = (otherBlock) => otherBlock.index%5;
+        const y = (otherBlock) => Math.floor(otherBlock.index/5);
         const neighbors = blocks.filter((potentialNeighbor) => {
             const differenceY = Math.abs(y(potentialNeighbor)-y(block));
             const differenceX = Math.abs(x(potentialNeighbor)-x(block));
@@ -65,19 +65,20 @@ function Block({blocks, index, setBlocks, turn, setWord,players}) {
             changeAllegiance(solidColor);
         }
         else if (neighborsAre(neighbors) === '' && block.allegiance===opponentSolidColor) {
-            console.log('hello');
             changeAllegiance(opponentColor);
         }
 
 
     }
     useEffect(() => {
-        if(clicked) {
-            changeAllegiance(turn===players[1]?'blue':'red');
+        const playerColor = turn===players[1]?'blue':'red';
+        const solidEnemyColor = turn===players[1]?'solidRed':'solidBlue';
+        if(clicked && allegiance !== solidEnemyColor) {
+            changeAllegiance(playerColor);
         }
         setClicked(false);
 
-    },[turn])
+    },[usedWords])
     useEffect(() => {
         checkNeighbors();
     },[blocks,turn])
