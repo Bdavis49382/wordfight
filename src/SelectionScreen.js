@@ -35,7 +35,8 @@ export default function SelectionScreen({games, user,setGame,setGameId}) {
                 turn:game.turn,
                 usedWords:game.usedWords,
                 redScore:game.redScore,
-                blueScore:game.blueScore
+                blueScore:game.blueScore,
+                lastMove:game.lastMove
         })
         return collectionReference.id;
       }
@@ -52,20 +53,26 @@ export default function SelectionScreen({games, user,setGame,setGameId}) {
         turn: user,
         usedWords: [],
         blueScore: 0,
-        redScore: 0
+        redScore: 0,
+        lastMove:''
     }
     newGame.id = await createGame(newGame);
     setGame(newGame);
     setGameId(newGame.id);
 
    }
+   const formatDate = (game) => {
+    const date = game.lastMove.toDate();
+    var time = date.toLocaleTimeString('en-US', { hour12: true });
+    return `Last Move: ${date.getMonth()}/${date.getDate()}/${date.getFullYear()} ${time}` 
+   }
     return (
         <div>
-            <h1>Select a game</h1>
+            <h1>Welcome {user}! Select a game</h1>
             <ul>
                 {games
                     .filter(game => game.players.includes(user) && (game.redScore < 10 && game.blueScore < 10))
-                    .map((game,index) => <li key={index} onClick={() => handleClick(game)}>{game.players[0]} vs {game.players[1]}  <b>{game.turn}'s turn</b></li>)}
+                    .map((game,index) => <li key={index} onClick={() => handleClick(game)}>{game.players[0]} vs {game.players[1]}  <b>{game.turn}'s turn</b> {game.lastMove !== '' && <b>{formatDate(game)}</b>}</li>)}
             </ul>
             <form onSubmit={handleSubmit}>
                 <h1>Or enter username of a friend to create game</h1>

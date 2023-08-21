@@ -1,7 +1,7 @@
 import React,{useEffect, useState} from 'react';
 import './App.css';
 import BlockGrid from './BlockGrid.js';
-import {setDoc, updateDoc,doc, onSnapshot} from 'firebase/firestore';
+import {setDoc, updateDoc,doc, onSnapshot, serverTimestamp} from 'firebase/firestore';
 import {db} from './firebase';
 function GameScreen({user,game,setGameId,gameId}) {
   const [players,setPlayers] = useState(game.players);
@@ -70,7 +70,7 @@ function GameScreen({user,game,setGameId,gameId}) {
     }
   const saveGame = () => {
       try {
-        setDoc(doc(db,'games',game.id),{blocks,players,turn,usedWords,blueScore,redScore})
+        updateDoc(doc(db,'games',game.id),{blocks,players,turn,usedWords,blueScore,redScore})
       }
       catch (err) {
         console.log('firebase error in setting document');
@@ -83,7 +83,8 @@ function GameScreen({user,game,setGameId,gameId}) {
         setTurn((turn) => turn===players[0]?players[1]:players[0]);
         setWord([]);
         const newBlocks = colorBlocks().map(checkNeighbors);
-        updateDoc(doc(db,'games',gameId), {"blocks":newBlocks})
+        updateDoc(doc(db,'games',gameId), {"blocks":newBlocks,'lastMove':serverTimestamp()})
+        
     }
     else {
         setMessage('That was not a valid word');
