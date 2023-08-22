@@ -18,7 +18,7 @@ function BlockGrid({turn, setWord,blocks,setBlocks,usedWords,players}) {
             </tr>);
     }
     return (
-        <table>
+        <table className="blockGrid">
             <tbody>
             {makeTable()}
             </tbody>

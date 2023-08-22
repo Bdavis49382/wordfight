@@ -2,8 +2,10 @@ import React,{useEffect, useState} from 'react';
 import './App.css';
 import BlockGrid from './BlockGrid.js';
 import {setDoc, updateDoc,doc, onSnapshot, serverTimestamp} from 'firebase/firestore';
+import Button from './Button';
 import {db} from './firebase';
-function GameScreen({user,game,setGameId,gameId}) {
+const colors = {'solidBlue':'#0e75e3','blue':'#5ba3f0','none':'white','red':'#db4d4d','solidRed':'#d10d0d'}
+function GameScreen({style,user,game,setGameId,gameId,setScreen}) {
   const [players,setPlayers] = useState(game.players);
   const [turn,setTurn] = useState(game.turn);
   const [word,setWord] = useState([]);
@@ -133,8 +135,8 @@ function GameScreen({user,game,setGameId,gameId}) {
     }
   }
   return (
-    <div className="GameScreen">
-      <h3 className='userName' style={{color:user === players[1]?'blue':'red'}}>{user}</h3> 
+    <div className="GameScreen" style={style}>
+      <h3 className='userName' style={{color:user === players[1]?colors.blue:colors.red}}>{user}</h3> 
       <h3 className='turn' >{turn === user ?"Your Turn":"Your Opponents Turn"}</h3>
         <BlockGrid 
             turn={turn} 
@@ -143,16 +145,16 @@ function GameScreen({user,game,setGameId,gameId}) {
             setBlocks={setBlocks} 
             players={players} 
             usedWords={usedWords}/>
-        <h2>{word.map((block) => block.letter).join(' ')}</h2>
-        {(turn === user && blueScore < 10 && redScore < 10) && <button onClick={endTurn}>Submit</button>}
-        <h3>{message}</h3>
-        {usedWords.length>0&&<h4>Last Word: {usedWords[usedWords.length-1].toLowerCase()}</h4>}
-        <button onClick={() => setGameId('')}>Back to Games</button>
-        <p>Score</p>
-        <p style={{color:'blue'}}>{blueScore}</p>
-        <p style={{color:'red'}}>{redScore}</p>
+        <div style={{width:'50%',margin:'10px auto'}}>
+          <div style={{color:colors.blue,fontSize:'150%',float:'left'}}>{blueScore}</div><div style={{color:colors.red,fontSize:'150%',textAlign:'right',}}>{redScore}</div>
+        <h3 style={{textAlign:'center',color:'gray'}}>{message}</h3>
+        </div>
+        <h2 style={{textAlign:'center'}}>{word.map((block) => block.letter).join(' ')}</h2>
+        {(turn === user && blueScore < 10 && redScore < 10) && <Button onClick={endTurn} text="Submit"></Button>}
         <p>{redScore>=10?"red won":""}</p>
         <p>{blueScore>=10?"blue won":""}</p>
+        <Button onClick={() => {setGameId('');setScreen('selection')}} text="Back to Games"/>
+        {usedWords.length>0&&<h4 style={{color:'gray'}}>Last Word: {usedWords[usedWords.length-1].toLowerCase()}</h4>}
     </div>
   );
 }

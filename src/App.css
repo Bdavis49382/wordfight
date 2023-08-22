@@ -36,19 +36,44 @@
     transform: rotate(360deg);
   }
 }
+body {
+  /* background-color:rgb(89, 10, 120); */
+  margin:0px;
+} 
+@media (min-width: 770px) {
+  body {
+    margin-left:20%;
+    margin-right:20%;
+    
+  }
+  .customButton {
+    width:20%;
+  }
+  .userName {
+    width:60%;
+  }
+}
+@media (max-width: 770px) {
+  .userName {
+    width:50%;
+  }
+}
 .userName {
-  color: blue;
   text-align: left;
-  display: inline;
+  display: block;
   float: left;
   margin-left: 2%;
 }
 .turn {
   color: green;
   text-align: right;
-  display: inline;
+  display: block;
   float: right;
   margin-right: 2%;
+}
+.blockGrid {
+  /* margin-top:10%; */
+  margin: 0 auto;
 }
 form {
   text-align: center;
@@ -66,4 +91,36 @@ td {
   font-size: 150%;
   width: 1em;
   background-color: white;
+}
+
+span {
+  -webkit-text-stroke-width: .5px;
+  -webkit-text-stroke-color: white;
+}
+
+/* html {
+  -webkit-text-stroke-width: .2px;
+  -webkit-text-stroke-color: lightgray;
+
+} */
+
+#homeHeader {
+  -webkit-text-stroke-width: .5px;
+  -webkit-text-stroke-color: white;
+
+}
+
+.game {
+  list-style-type: none;
+}
+.customButton {
+  width:'auto',
+}
+
+.customButton:hover {
+  cursor:pointer
+}
+
+h1 {
+  margin-top:0px;
 }
