@@ -1,4 +1,4 @@
-import {addDoc,collection} from 'firebase/firestore';
+import {addDoc,collection,getDocs,query} from 'firebase/firestore';
 import {db} from './firebase';
 import Game from './Game';
 export default function SelectionScreen({games, user,setGame,setGameId,setScreen,style}) {
@@ -48,10 +48,21 @@ export default function SelectionScreen({games, user,setGame,setGameId,setScreen
   }
    const handleSubmit = async(event) => {
     event.preventDefault();
+    const q = query(collection(db,'players'));
+    const querySnapshot = await getDocs(q);
+    let opponent = event.target.elements.opponent.value;
+    if (opponent.includes('@')) {
+       opponent = opponent.slice(0,opponent.indexOf('@')); 
+    }
+    // querySnapshot.forEach(doc => console.log(doc.data()))
+    if (querySnapshot.docs.filter(doc => doc.data().name === opponent).length === 0) {
+        alert('There is no account under the username ' + opponent)
+        return;
+    }
     const newGame = {
         id:'',
         blocks: buildNewGrid(),
-        players: [user,event.target.elements.opponent.value],
+        players: [user,opponent],
         turn: user,
         usedWords: [],
         blueScore: 0,

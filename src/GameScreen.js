@@ -24,6 +24,24 @@ function GameScreen({style,user,game,setGameId,gameId,setScreen}) {
       setRedScore(doc.data().redScore);
     })
   }
+  const updateScore = () => {
+    const blue = blocks.map(block => block.allegiance==='solidBlue'?1:0).reduce((a,b) => a + b);
+    const red = blocks.map(block => block.allegiance==='solidRed'?1:0).reduce((a,b) => a + b);
+    setBlueScore(blue);
+    setRedScore(red);
+    if (red >= 10 || blue >= 10) {
+      const winner = blue > red?1:0;
+      setMessage(players.indexOf(user) === winner?'You Win':'You Lose');
+      saveGame(blue,red);
+    }
+    else if(turn === user){
+        setMessage('Click on Letters to Form a Word');
+    }
+    else {
+      saveGame(blue,red);
+      setMessage('Waiting for your opponent...');
+    }
+  }
     const neighborsAre = (neighbors) => {
         if (neighbors.every((neighbor) => neighbor.allegiance==='blue'|| neighbor.allegiance ==='solidBlue')) {
             return 'blue';
@@ -70,9 +88,9 @@ function GameScreen({style,user,game,setGameId,gameId,setScreen}) {
         }
         return block;
     }
-  const saveGame = () => {
+  const saveGame = (blue,red) => {
       try {
-        updateDoc(doc(db,'games',game.id),{blocks,players,turn,usedWords,blueScore,redScore})
+        updateDoc(doc(db,'games',game.id),{blocks,players,turn,usedWords,blueScore:blue,redScore:red})
       }
       catch (err) {
         console.log('firebase error in setting document');
@@ -111,24 +129,15 @@ function GameScreen({style,user,game,setGameId,gameId,setScreen}) {
     loadGame();
   },[])
   useEffect(() => {
-    if (redScore >= 10 || blueScore >= 10) {
-      setMessage('Game Over');
-    }
-    else if(turn === user){
-        setMessage('Click on Letters to Form a Word');
-    }
-    else {
-      saveGame();
-      setMessage('Waiting for your opponent...');
-    }
-    
+    updateScore();
   },[turn,user])
   async function verifyWord(word) {
     
     let url = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
     const response = await fetch(url);
     if (response.ok) {
-        return true
+
+        return !usedWords.includes(word);
     }
     else {
         return false
@@ -151,8 +160,6 @@ function GameScreen({style,user,game,setGameId,gameId,setScreen}) {
         </div>
         <h2 style={{textAlign:'center'}}>{word.map((block) => block.letter).join(' ')}</h2>
         {(turn === user && blueScore < 10 && redScore < 10) && <Button onClick={endTurn} text="Submit"></Button>}
-        <p>{redScore>=10?"red won":""}</p>
-        <p>{blueScore>=10?"blue won":""}</p>
         <Button onClick={() => {setGameId('');setScreen('selection')}} text="Back to Games"/>
         {usedWords.length>0&&<h4 style={{color:'gray'}}>Last Word: {usedWords[usedWords.length-1].toLowerCase()}</h4>}
     </div>

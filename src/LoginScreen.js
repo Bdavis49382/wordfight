@@ -2,6 +2,8 @@
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import Form from './Form';
 import './App.css';
+import {db} from './firebase';
+import {addDoc,collection} from 'firebase/firestore';
 function LoginScreen({setUser,setScreen,screen,style}) {
     const handleSubmit = async (event,newAccount) => {
         const auth = getAuth();
@@ -9,6 +11,7 @@ function LoginScreen({setUser,setScreen,screen,style}) {
         const elements = event.target.elements;
         try{
           if (newAccount) {
+            addDoc(collection(db,'players'), {name: elements.username.value.slice(0,elements.username.value.indexOf('@'))});
             await createUserWithEmailAndPassword(auth,elements.username.value,elements.password.value);
           }
           else {
