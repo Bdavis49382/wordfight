@@ -20,6 +20,8 @@ export default function Home({setScreen,style}) {
             <span style={boxStyle}>T</span>
             <Button onClick={() => setScreen('login')} text='Log in' style={{margin:'auto',marginTop: '100px'}}/>
             <Button onClick={() => setScreen('register')} text='Register' style={{margin:'auto',marginTop: '20px'}}/>
+            <Button onClick={() => setScreen('rules')} text='Rules' style={{margin:'auto',marginTop: '20px'}}/>
+
         
 
         </div>

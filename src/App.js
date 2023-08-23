@@ -4,6 +4,7 @@ import React,{useState,useEffect} from 'react';
 import LoginScreen from './LoginScreen';
 import SelectionScreen from './SelectionScreen';
 import Home from './Home';
+import Rules from './Rules';
 import {collection,onSnapshot,query} from 'firebase/firestore';
 import {db} from './firebase';
 const screenStyle = {
@@ -74,6 +75,10 @@ function App() {
           setScreen={setScreen}
           />
       );
+      case 'rules':
+        return (
+          <Rules style={screenStyle} setScreen={setScreen}></Rules>
+        )
       default:
         return <p>Error: Didn't switch to an actual page.</p>
   }
