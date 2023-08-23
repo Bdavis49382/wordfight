@@ -1,9 +1,8 @@
 import {addDoc,collection,getDocs,query} from 'firebase/firestore';
 import {db} from './firebase';
 import Game from './Game';
-export default function SelectionScreen({games, user,setGame,setGameId,setScreen,style}) {
-//    console.log(user);
-//    console.log(games); 
+import Button from './Button';
+export default function SelectionScreen({games, user, setGame,setGameId,setScreen,style}) {
    const handleClick = (game) => {
     setGame(game);
     setGameId(game.id);
@@ -117,6 +116,9 @@ export default function SelectionScreen({games, user,setGame,setGameId,setScreen
    }
     return (
         <div style={style}>
+            <Button onClick={() => {
+                setScreen('home');
+            }}text="Log out" style={{float:'right'}}></Button>
             <div>{user}</div>
             <h1 style={{textAlign:'center'}}>Games</h1>
             <ul style={{padding:5}}>

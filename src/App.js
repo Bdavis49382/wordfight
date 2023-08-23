@@ -4,7 +4,7 @@ import React,{useState,useEffect} from 'react';
 import LoginScreen from './LoginScreen';
 import SelectionScreen from './SelectionScreen';
 import Home from './Home';
-import {doc, collection,onSnapshot,query} from 'firebase/firestore';
+import {collection,onSnapshot,query} from 'firebase/firestore';
 import {db} from './firebase';
 const screenStyle = {
   backgroundColor:'rgb(89, 10, 120)',
