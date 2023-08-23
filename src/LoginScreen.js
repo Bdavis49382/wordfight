@@ -12,14 +12,14 @@ function LoginScreen({setUser,setScreen,screen,style}) {
         const elements = event.target.elements;
         try{
           if (newAccount) {
-            addDoc(collection(db,'players'), {name: elements.username.value.slice(0,elements.username.value.indexOf('@'))});
-            await createUserWithEmailAndPassword(auth,elements.username.value,elements.password.value);
+            addDoc(collection(db,'players'), {name: elements.username.value.slice(0,elements.username.value.indexOf('@')).trim().toLowerCase()});
+            await createUserWithEmailAndPassword(auth,elements.username.value.trim().toLowerCase(),elements.password.value.trim());
           }
           else {
-            await signInWithEmailAndPassword(auth,elements.username.value,elements.password.value);
+            await signInWithEmailAndPassword(auth,elements.username.value.trim().toLowerCase(),elements.password.value.trim());
           }
           const atSign = elements.username.value.indexOf("@")
-          setUser(elements.username.value.slice(0,atSign));
+          setUser(elements.username.value.slice(0,atSign).trim().toLowerCase());
           event.target.reset();
           setScreen('selection');
 

@@ -1,4 +1,4 @@
-import {addDoc,collection,getDocs,query} from 'firebase/firestore';
+import {addDoc,collection,getDocs,query,serverTimestamp} from 'firebase/firestore';
 import {db} from './firebase';
 import Game from './Game';
 import Button from './Button';
@@ -37,7 +37,7 @@ export default function SelectionScreen({games, user, setGame,setGameId,setScree
                 usedWords:game.usedWords,
                 redScore:game.redScore,
                 blueScore:game.blueScore,
-                lastMove:game.lastMove
+                lastMove:serverTimestamp()
         })
         return collectionReference.id;
       }
@@ -67,7 +67,7 @@ export default function SelectionScreen({games, user, setGame,setGameId,setScree
     event.preventDefault();
     const q = query(collection(db,'players'));
     const querySnapshot = await getDocs(q);
-    let opponent = event.target.elements.opponent.value;
+    let opponent = event.target.elements.opponent.value.trim().toLowerCase();
     if (opponent.includes('@')) {
        opponent = opponent.slice(0,opponent.indexOf('@')); 
     }
@@ -84,7 +84,7 @@ export default function SelectionScreen({games, user, setGame,setGameId,setScree
         usedWords: [],
         blueScore: 0,
         redScore: 0,
-        lastMove:''
+        lastMove:serverTimestamp()
     }
     newGame.id = await createGame(newGame);
     setGame(newGame);
@@ -93,7 +93,7 @@ export default function SelectionScreen({games, user, setGame,setGameId,setScree
 
    }
    const formatDate = (game) => {
-    if (game.lastMove === '') {
+    if (game.lastMove ===null) {
         return '';
     }
     const date = game.lastMove.toDate().getTime();
@@ -124,6 +124,14 @@ export default function SelectionScreen({games, user, setGame,setGameId,setScree
             <ul style={{padding:5}}>
                 {games
                     .filter(game => game.players.includes(user) && (game.redScore < 10 && game.blueScore < 10))
+                    .sort((game1,game2) =>   {
+                        if (game1.lastMove !== null && game2.lastMove !== null) {
+                            return game2.lastMove.toDate().getTime() - game1.lastMove.toDate().getTime()
+                        }
+                        else {
+                            return 0;
+                        }
+                    })
                     .map((game,index) => <Game key={index} onClick={() => handleClick(game)} game={game} user={user} time={formatDate(game)}></Game>)
                     // .map((game,index) => <li className="game" key={index} onClick={() => handleClick(game)}>{game.players[0]} vs {game.players[1]}  <b>{game.turn}'s turn</b> {game.lastMove !== '' && <b>{formatDate(game)}</b>}</li>)}
                 }

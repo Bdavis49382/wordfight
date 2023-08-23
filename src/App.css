@@ -57,7 +57,10 @@ body {
   .userName {
     width:50%;
   }
-}
+  .customButton {
+    height:3%;
+    padding-bottom:1%;
+  }}
 .userName {
   text-align: left;
   display: block;
@@ -81,15 +84,15 @@ form {
 table {
   text-align: center;
   margin: 0 auto;
-  width: 60%;
+  width: 90%;
   max-width: 400px;
   background-color: gray;
 }
 td {
   border: black solid 1px;
   border-radius: 2px;
-  font-size: 150%;
-  width: 1em;
+  font-size: 200%;
+  width: 2em;
   background-color: white;
 }
 
@@ -114,8 +117,10 @@ span {
   list-style-type: none;
 }
 .customButton {
-  width:'auto',
+  width:'20%';
+  margin-bottom:10px;
 }
+
 
 input {
   background-color:lightgray;
