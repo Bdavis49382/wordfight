@@ -46,6 +46,24 @@ export default function SelectionScreen({games, user,setGame,setGameId,setScreen
         console.log("firebase unsuccessful");
       }
   }
+  const findClosest = (wordArray,targetWord) => {
+    const samenessScores = wordArray.map(word => {
+        let sameness = 0;
+        for (let i=0;i<word.length;i++) {
+            if (i < targetWord.length && word.charAt(i) === targetWord.charAt(i)) {
+                sameness++;
+            }
+        }
+        return sameness;
+    })
+    let highest = 0;
+    samenessScores.forEach((score,index) => {
+        if (score > samenessScores[highest]) {
+            highest = index;
+        }
+    })
+    return wordArray[highest];
+  }
    const handleSubmit = async(event) => {
     event.preventDefault();
     const q = query(collection(db,'players'));
@@ -54,9 +72,9 @@ export default function SelectionScreen({games, user,setGame,setGameId,setScreen
     if (opponent.includes('@')) {
        opponent = opponent.slice(0,opponent.indexOf('@')); 
     }
-    // querySnapshot.forEach(doc => console.log(doc.data()))
     if (querySnapshot.docs.filter(doc => doc.data().name === opponent).length === 0) {
-        alert('There is no account under the username ' + opponent)
+        const names = querySnapshot.docs.map(doc => doc.data().name);
+        alert('There is no account under the username ' + opponent + '. Perhaps you meant: ' + findClosest(names,opponent))
         return;
     }
     const newGame = {
