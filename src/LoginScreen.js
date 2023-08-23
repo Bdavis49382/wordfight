@@ -3,6 +3,7 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } f
 import Form from './Form';
 import './App.css';
 import {db} from './firebase';
+import Button from './Button';
 import {addDoc,collection} from 'firebase/firestore';
 function LoginScreen({setUser,setScreen,screen,style}) {
     const handleSubmit = async (event,newAccount) => {
@@ -31,9 +32,10 @@ function LoginScreen({setUser,setScreen,screen,style}) {
     
   return (
     <div className="LoginScreen" style={style}>
+      <Button onClick={() => setScreen('home')} style={{float:'right'}} text="Home"/>
       {screen === 'register'
-      ?<Form handleSubmit={async (event) => await handleSubmit(event,true)} text="Register Here" />
-      :<Form handleSubmit={async (event) => await handleSubmit(event,false)} text="Login here" />}
+      ?<Form handleSubmit={async (event) => await handleSubmit(event,true)} text="Sign up" />
+      :<Form handleSubmit={async (event) => await handleSubmit(event,false)} text="Login" />}
     </div>
   );
 }
