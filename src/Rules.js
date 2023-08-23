@@ -3,7 +3,7 @@ export default function Rules({setScreen,style}) {
     return (
         <div style={style}>
            <Button text="Home" onClick={() => setScreen('home')} style={{float:'right'}}></Button> 
-           <h2 style={{textAlign:'center'}}>Rules</h2>
+           <h2 style={{textAlign:'center',marginTop:0}}>Rules</h2>
            <p>Wordfight is a simple word-based strategy game. Each player fights to control the board by creating words on their turn.
              The first player to 'own' 10 blocks wins.</p>
            <p>The game board is made up of 25 letter blocks, randomly generated each game. On their turn, the player uses the letters on the blocks
