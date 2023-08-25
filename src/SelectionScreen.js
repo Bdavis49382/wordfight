@@ -98,7 +98,7 @@ export default function SelectionScreen({games, user, setGame,setGameId,setScree
     }
     const date = game.lastMove.toDate().getTime();
     const now = new Date().getTime();
-    const minutes = Math.floor((now-date)/36000)
+    const minutes = Math.floor((now-date)/60000)
     if (minutes < 1) {
         return 'Last Move: just now';
     }
@@ -123,7 +123,7 @@ export default function SelectionScreen({games, user, setGame,setGameId,setScree
             <h1 style={{textAlign:'center'}}>Games</h1>
             <ul style={{padding:5}}>
                 {games
-                    .filter(game => game.players.includes(user) && (game.redScore < 10 && game.blueScore < 10))
+                    .filter(game => game.players.includes(user))
                     .sort((game1,game2) =>   {
                         if (game1.lastMove !== null && game2.lastMove !== null) {
                             return game2.lastMove.toDate().getTime() - game1.lastMove.toDate().getTime()

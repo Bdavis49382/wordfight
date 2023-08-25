@@ -136,8 +136,13 @@ function GameScreen({style,user,game,setGameId,gameId,setScreen}) {
     let url = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
     const response = await fetch(url);
     if (response.ok) {
-
-        return !usedWords.includes(word);
+      if (usedWords.includes(word)) {
+        alert(word + 'has already been played this game.');
+        return false;
+      }
+      else {
+        return true;
+      }
     }
     else {
         return false
