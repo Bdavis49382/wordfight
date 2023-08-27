@@ -1,8 +1,10 @@
 import {addDoc,collection,getDocs,query,serverTimestamp} from 'firebase/firestore';
+import {useState,useEffect} from 'react';
 import {db} from './firebase';
 import Game from './Game';
 import Button from './Button';
 export default function SelectionScreen({games, user, setGame,setGameId,setScreen,style}) {
+    const [players,setPlayers] = useState([]);
    const handleClick = (game) => {
     setGame(game);
     setGameId(game.id);
@@ -28,6 +30,14 @@ export default function SelectionScreen({games, user, setGame,setGameId,setScree
             clicked:false
         })); 
     }
+    const getPlayers = async () => {
+        const q = query(collection(db,'players'));
+        const querySnapshot = await getDocs(q);
+        setPlayers(querySnapshot.docs.map(doc => doc.data()).filter(doc => doc.name !== user));
+    }
+    useEffect(() => {
+        getPlayers();
+    },[])
   const createGame = async (game) => {
       try {
         const collectionReference = await addDoc(collection(db,'games'),{
@@ -65,14 +75,14 @@ export default function SelectionScreen({games, user, setGame,setGameId,setScree
   }
    const handleSubmit = async(event) => {
     event.preventDefault();
-    const q = query(collection(db,'players'));
-    const querySnapshot = await getDocs(q);
+    // const q = query(collection(db,'players'));
+    // const querySnapshot = await getDocs(q);
     let opponent = event.target.elements.opponent.value.trim().toLowerCase();
     if (opponent.includes('@')) {
        opponent = opponent.slice(0,opponent.indexOf('@')); 
     }
-    if (querySnapshot.docs.filter(doc => doc.data().name === opponent).length === 0) {
-        const names = querySnapshot.docs.map(doc => doc.data().name);
+    if (players.filter(player => player.name === opponent).length === 0) {
+        const names = players.map(player => player.name);
         alert('There is no account under the username ' + opponent + '. Perhaps you meant: ' + findClosest(names,opponent))
         return;
     }
@@ -141,6 +151,10 @@ export default function SelectionScreen({games, user, setGame,setGameId,setScree
                 <input name="opponent" type="text" placeholder="opponent"/>
                 <input type="submit"/>
             </form>
+            <h3 style={{marginBottom:0}}>Players:</h3>
+            <ul style={{marginTop:0,paddingBottom:20}}>
+                {players.map(player => <li key={player.id}>{player.name}</li>)}
+            </ul>
 
 
         </div>

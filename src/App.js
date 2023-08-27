@@ -5,11 +5,11 @@ import LoginScreen from './LoginScreen';
 import SelectionScreen from './SelectionScreen';
 import Home from './Home';
 import Rules from './Rules';
-import {collection,onSnapshot,query} from 'firebase/firestore';
+import {collection,doc,deleteDoc,onSnapshot,query} from 'firebase/firestore';
 import {db} from './firebase';
 const screenStyle = {
   backgroundColor:'rgb(89, 10, 120)',
-  height:'100vh',
+  minHeight:'100vh',
   marginTop:0,
   color:'gray'
 }
@@ -36,8 +36,21 @@ function App() {
     }
 
   }
+  const removeOldGames = () => {
+    games.forEach(game => {
+      const lastMove = game.lastMove.toDate().getTime();
+      const now = new Date();
+      const minutes = Math.floor((now-lastMove)/60000)
+      if (minutes > 1440 && (game.redScore >= 10 || game.blueScore >= 10)) {
+        deleteDoc(doc(db,'games',game.id));
+        // console.log('deleting ',game)
+      }
+    })
+  }
+  
   useEffect(() => {
     loadGames();
+    removeOldGames();
   },[])
   switch (screen) {
     case 'home':
