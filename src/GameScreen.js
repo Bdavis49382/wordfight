@@ -151,7 +151,7 @@ function GameScreen({style,user,game,setGameId,gameId,setScreen}) {
   return (
     <div className="GameScreen" style={style}>
       <h3 className='userName' style={{color:user === players[1]?colors.blue:colors.red}}>{user}</h3> 
-      <h3 className='turn' >{turn === user ?"Your Turn":"Your Opponents Turn"}</h3>
+      <h3 className='turn' style={{color:user === players[1]?colors.red:colors.blue}}>{players[0] === user ?players[1]:players[0]}</h3>
         <BlockGrid 
             turn={turn} 
             setWord={setWord} 
@@ -160,7 +160,7 @@ function GameScreen({style,user,game,setGameId,gameId,setScreen}) {
             players={players} 
             usedWords={usedWords}/>
         <div style={{width:'50%',margin:'10px auto'}}>
-          <div style={{color:colors.blue,fontSize:'150%',float:'left'}}>{blueScore}</div><div style={{color:colors.red,fontSize:'150%',textAlign:'right',}}>{redScore}</div>
+          <div style={{color:colors.blue,fontSize:'150%',float:user===players[1]?'left':'right'}}>{blueScore}</div><div style={{color:colors.red,fontSize:'150%',textAlign:user===players[0]?'left':'right'}}>{redScore}</div>
         <h3 style={{textAlign:'center',color:'gray'}}>{message}</h3>
         </div>
         <h2 style={{textAlign:'center'}}>{word.map((block) => block.letter).join(' ')}</h2>

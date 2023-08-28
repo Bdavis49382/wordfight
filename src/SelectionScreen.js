@@ -110,16 +110,16 @@ export default function SelectionScreen({games, user, setGame,setGameId,setScree
     const now = new Date().getTime();
     const minutes = Math.floor((now-date)/60000)
     if (minutes < 1) {
-        return 'Last Move: just now';
+        return 'just now';
     }
     if (minutes < 60) {
-        return `Last Move: ${minutes} minutes ago`;
+        return `${minutes} minutes ago`;
     }
     else if (minutes < 1440){
-        return `Last Move: ${Math.floor(minutes/60)} hours, ${minutes%60} minutes ago`;
+        return `${Math.floor(minutes/60)} hours, ${minutes%60} minutes ago`;
     }
     else {
-        return `Last Move ${Math.floor(minutes/1440)} days, ${Math.floor((minutes%1440)/60)} hours, ${minutes %60} minutes ago`
+        return `${Math.floor(minutes/1440)} days, ${Math.floor((minutes%1440)/60)} hours, ${minutes %60} minutes ago`
     }
     // var time = date.toLocaleTimeString('en-US', { hour12: true });
     // return `Last Move: ${date.getMonth()}/${date.getDate()}/${date.getFullYear()} ${time}` 
