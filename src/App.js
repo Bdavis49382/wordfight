@@ -41,9 +41,6 @@ function App() {
       const lastMove = game.lastMove.toDate().getTime();
       const now = new Date();
       const minutes = Math.floor((now-lastMove)/60000)
-      if (minutes > 1440) {
-        console.log('Game is a day old')
-      }
       if (minutes > 1440 && (game.redScore >= 10 || game.blueScore >= 10)) {
         deleteDoc(doc(db,'games',game.id));
         console.log('deleting ',game)
@@ -53,8 +50,10 @@ function App() {
   
   useEffect(() => {
     loadGames();
-    removeOldGames();
   },[])
+  useEffect(() => {
+    removeOldGames();
+  },[games])
   switch (screen) {
     case 'home':
       return <Home 
