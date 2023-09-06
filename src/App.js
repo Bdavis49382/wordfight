@@ -38,6 +38,10 @@ function App() {
   }
   const removeOldGames = () => {
     games.forEach(game => {
+      if (game.lastMove == null) {
+        console.log('cannot delete game, null lastMove')
+        return;
+      }
       const lastMove = game.lastMove.toDate().getTime();
       const now = new Date();
       const minutes = Math.floor((now-lastMove)/60000)
