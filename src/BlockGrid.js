@@ -6,7 +6,6 @@ function BlockGrid({turn, setWord,blocks,setBlocks,usedWords,players}) {
 
     const makeTable = () => {
         const blockRows = [];
-        // console.log(blocks)
         for(let i=0;i<5;i++){
             blockRows.push(blocks.filter(block => Math.floor(block.index/5)===i));
         }

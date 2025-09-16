@@ -1,35 +1,19 @@
 import {addDoc,collection,getDocs,query,serverTimestamp} from 'firebase/firestore';
+import { getAuth, signOut } from 'firebase/auth';
 import {useState,useEffect} from 'react';
 import {db} from './firebase';
 import Game from './Game';
 import Button from './Button';
+import { buildNewGrid } from './utils';
+
 export default function SelectionScreen({games, user, setGame,setGameId,setScreen,style}) {
     const [players,setPlayers] = useState([]);
+    const auth = getAuth()
    const handleClick = (game) => {
     setGame(game);
     setGameId(game.id);
     setScreen('game');
    }
-    const buildNewGrid = () => {
-        const newDice = ["AAEEGN","ELRTTY","AOOTTW","ABBJOO","EHRTVW","CIMOTU","DISTTY","EIOSST","DELRVY","ACHOPS","HIMNQU","EEINSU","EEGHNW","AFFKPS","HLNNRZ","DEILRX","AAEEGN","ACHOPS","AFFKPS","DEILRX","DELRVY","EEGHNW","EIOSST","HIMNQU","HLNNRZ",
-          ];
-          let shuffledDice = [];
-          while (newDice.length > 0) {
-            let randomDie = newDice.splice(Math.floor(Math.random() * newDice.length), 1);
-        
-            shuffledDice.push(randomDie);
-          }
-        
-          let letters = shuffledDice.map((die) =>
-            die[0].charAt(Math.floor(Math.random() * die[0].length))
-          );
-          return letters.map((letter,index) => ({
-            index:index,
-            letter:letter,
-            allegiance:'none',
-            clicked:false
-        })); 
-    }
     const getPlayers = async () => {
         const q = query(collection(db,'players'));
         const querySnapshot = await getDocs(q);
@@ -128,6 +112,7 @@ export default function SelectionScreen({games, user, setGame,setGameId,setScree
         <div style={style}>
             <Button onClick={() => {
                 setScreen('home');
+                signOut(auth);
             }}text="Log out" style={{float:'right'}}></Button>
             <div>{user}</div>
             <h1 style={{textAlign:'center'}}>Games</h1>

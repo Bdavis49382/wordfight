@@ -8,7 +8,8 @@ function Block({blocks, index, setBlocks, turn, setWord,players,usedWords}) {
     const styles = {
         background:colors[allegiance],
         color:'black',
-        opacity: clicked ?0.2 : 1
+        opacity: clicked ?0.05 : 1,
+        fontWeight: clicked?'':'bold',
     }
     const setClicked = (value) => {
         setBlocks((prevBlocks) => {

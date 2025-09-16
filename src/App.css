@@ -2,6 +2,9 @@
   text-align: center;
 }
 
+body {
+  background-color:rgb(212, 175, 97),
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -13,44 +16,28 @@
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
 .App-link {
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
 body {
   /* background-color:rgb(89, 10, 120); */
   margin:0px;
 } 
 @media (min-width: 770px) {
-  body {
+  /* body {
     margin-left:20%;
     margin-right:20%;
     
-  }
+  } */
   .customButton {
     width:20%;
   }
   .userName {
     width:60%;
+  }
+  td {
+    font-size: 300%;
   }
 }
 @media (max-width: 770px) {
@@ -59,8 +46,11 @@ body {
   }
   .customButton {
     height:3%;
-    padding-bottom:1%;
-  }}
+  }
+  td {
+    font-size: 200%;
+  }
+}
 .userName {
   text-align: left;
   display: block;
@@ -84,15 +74,17 @@ table {
   text-align: center;
   margin: 0 auto;
   width: 90%;
-  max-width: 400px;
-  background-color: gray;
+  max-width: 700px;
+  background-color: rgb(212, 175, 97);
 }
+
 td {
-  border: black solid 1px;
-  border-radius: 2px;
-  font-size: 200%;
-  width: 2em;
+  border: black solid 2px;
+  border-radius: 10px;
+  width: 2.2em;
+  height: 2em;
   background-color: white;
+  box-shadow: 1px 1px 1px rgb(97, 81, 44);
 }
 
 span {
@@ -116,10 +108,9 @@ span {
   list-style-type: none;
 }
 .customButton {
-  width:'20%';
+  padding: 10px;
   margin-bottom:10px;
 }
-
 
 input {
   background-color:lightgray;

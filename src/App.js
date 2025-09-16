@@ -7,11 +7,12 @@ import Home from './Home';
 import Rules from './Rules';
 import {collection,doc,deleteDoc,onSnapshot,query} from 'firebase/firestore';
 import {db} from './firebase';
+import { getAuth, onAuthStateChanged} from "firebase/auth";
 const screenStyle = {
-  backgroundColor:'rgb(89, 10, 120)',
+  backgroundColor:'rgb(212, 175, 97)',
   minHeight:'100vh',
   marginTop:0,
-  color:'gray'
+  color:'black'
 }
 function App() {
   const [user,setUser] = useState('');
@@ -19,6 +20,18 @@ function App() {
   const[game,setGame] = useState({});
   const [gameId,setGameId] = useState('');
   const [screen,setScreen] = useState('home');
+  const auth = getAuth();
+  onAuthStateChanged(auth, (userAuth) => {
+    if (userAuth && user === '') {
+      const atSign = userAuth.email.indexOf("@")
+      setUser(userAuth.email.slice(0,atSign).trim().toLowerCase());
+      setScreen('selection')
+    } else if (user !== '' && userAuth === undefined) {
+      setUser('')
+      setScreen('home')
+    }
+    console.log('user is logged in: ',user)
+  })
   
   const loadGames = () => {
     try {
