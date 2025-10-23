@@ -1,8 +1,7 @@
-import React,{useEffect, useState} from 'react';
 import './App.css';
 import Block from './Block.js';
 
-function BlockGrid({turn, setWord,blocks,setBlocks,usedWords,players}) {
+function BlockGrid({turn, setWord,blocks,setBlocks,usedWords,players, user}) {
 
     const makeTable = () => {
         const blockRows = [];
@@ -12,7 +11,7 @@ function BlockGrid({turn, setWord,blocks,setBlocks,usedWords,players}) {
         return blockRows.map((row,index) => 
             <tr key={index}>
                 {row.map((block,index) =>
-                    <Block usedWords={usedWords} key={index} blocks={blocks} index={block.index} players={players} setBlocks={setBlocks} turn={turn} setWord={setWord} />)
+                    <Block usedWords={usedWords} key={index} blocks={blocks} index={block.index} players={players} setBlocks={setBlocks} turn={turn} setWord={setWord} user={user}/>)
                 }
             </tr>);
     }

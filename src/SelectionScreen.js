@@ -1,10 +1,10 @@
-import {addDoc,collection,getDocs,query,serverTimestamp} from 'firebase/firestore';
+import {collection,getDocs,query} from 'firebase/firestore';
 import { getAuth, signOut } from 'firebase/auth';
 import {useState,useEffect} from 'react';
 import {db} from './firebase';
 import Game from './Game';
 import Button from './Button';
-import { buildNewGrid } from './utils';
+import { createGame } from './firebase';
 
 export default function SelectionScreen({games, user, setGame,setGameId,setScreen,style}) {
     const [players,setPlayers] = useState([]);
@@ -17,28 +17,11 @@ export default function SelectionScreen({games, user, setGame,setGameId,setScree
     const getPlayers = async () => {
         const q = query(collection(db,'players'));
         const querySnapshot = await getDocs(q);
-        setPlayers(querySnapshot.docs.map(doc => doc.data()).filter(doc => doc.name !== user));
+        setPlayers(querySnapshot.docs.map(doc => {return {...doc.data(),id:doc.id}}).filter(doc => doc.name !== user));
     }
     useEffect(() => {
         getPlayers();
     },[])
-  const createGame = async (game) => {
-      try {
-        const collectionReference = await addDoc(collection(db,'games'),{
-                blocks:game.blocks,
-                players:game.players,
-                turn:game.turn,
-                usedWords:game.usedWords,
-                redScore:game.redScore,
-                blueScore:game.blueScore,
-                lastMove:serverTimestamp()
-        })
-        return collectionReference.id;
-      }
-      catch {
-        console.log("firebase unsuccessful");
-      }
-  }
   const findClosest = (wordArray,targetWord) => {
     const samenessScores = wordArray.map(word => {
         let sameness = 0;
@@ -59,9 +42,10 @@ export default function SelectionScreen({games, user, setGame,setGameId,setScree
   }
    const handleSubmit = async(event) => {
     event.preventDefault();
-    // const q = query(collection(db,'players'));
-    // const querySnapshot = await getDocs(q);
     let opponent = event.target.elements.opponent.value.trim().toLowerCase();
+    if (opponent === '') {
+        return;
+    }
     if (opponent.includes('@')) {
        opponent = opponent.slice(0,opponent.indexOf('@')); 
     }
@@ -70,20 +54,14 @@ export default function SelectionScreen({games, user, setGame,setGameId,setScree
         alert('There is no account under the username ' + opponent + '. Perhaps you meant: ' + findClosest(names,opponent))
         return;
     }
-    const newGame = {
-        id:'',
-        blocks: buildNewGrid(),
-        players: [user,opponent],
-        turn: user,
-        usedWords: [],
-        blueScore: 0,
-        redScore: 0,
-        lastMove:serverTimestamp()
+    try {
+        const newGame = await createGame({user,opponent}) 
+        setGame(newGame.data);
+        setGameId(newGame.data.id);
+        setScreen('game');
+    } catch (e) {
+        console.error(`Firebase failed in creating a new game: ${e.message}, ${e.details}`)
     }
-    newGame.id = await createGame(newGame);
-    setGame(newGame);
-    setGameId(newGame.id);
-    setScreen('game');
 
    }
    const formatDate = (game) => {
@@ -118,30 +96,18 @@ export default function SelectionScreen({games, user, setGame,setGameId,setScree
             <h1 style={{textAlign:'center'}}>Games</h1>
             <ul style={{padding:5}}>
                 {games
-                    .filter(game => game.players.includes(user))
-                    .sort((game1,game2) =>   {
-                        if (game1.lastMove !== null && game2.lastMove !== null) {
-                            return game2.lastMove.toDate().getTime() - game1.lastMove.toDate().getTime()
-                        }
-                        else {
-                            return 0;
-                        }
-                    })
                     .map((game,index) => <Game key={index} onClick={() => handleClick(game)} game={game} user={user} time={formatDate(game)}></Game>)
-                    // .map((game,index) => <li className="game" key={index} onClick={() => handleClick(game)}>{game.players[0]} vs {game.players[1]}  <b>{game.turn}'s turn</b> {game.lastMove !== '' && <b>{formatDate(game)}</b>}</li>)}
                 }
             </ul>
             <form onSubmit={handleSubmit}>
-                <h1>Or enter username of a friend to create game</h1>
-                <input name="opponent" type="text" placeholder="opponent"/>
+                <h1>Start New Game</h1>
+                <select name="opponent">
+                    <option value="">Choose Opponent</option>
+                    {players.map(player => <option key={player.id} value={player.name}>{player.name}</option>)}
+                </select>
+                {/* <input name="opponent" type="text" placeholder="opponent"/> */}
                 <input type="submit"/>
             </form>
-            <h3 style={{marginBottom:0}}>Players:</h3>
-            <ul style={{marginTop:0,paddingBottom:20}}>
-                {players.map(player => <li key={player.id}>{player.name}</li>)}
-            </ul>
-
-
         </div>
     )
 }

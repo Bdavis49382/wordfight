@@ -1,15 +1,15 @@
-import React,{useEffect, useState} from 'react';
-
-function Block({blocks, index, setBlocks, turn, setWord,players,usedWords}) {
+function Block({blocks, index, setBlocks, turn, setWord,user}) {
     const block = blocks[index];
-    const {clicked,allegiance} = block;
+    const {clicked=false,allegiance, surrounded} = block;
 
     const colors = {'solidBlue':'#0e75e3','blue':'#5ba3f0','none':'white','red':'#db4d4d','solidRed':'#d10d0d'}
+    const color = allegiance ===  user ? (surrounded ? colors.solidRed : colors.red) : (allegiance === 'none' ? colors.none :(surrounded ? colors.solidBlue : colors.blue))
     const styles = {
-        background:colors[allegiance],
+        background:color,
         color:'black',
         opacity: clicked ?0.05 : 1,
         fontWeight: clicked?'':'bold',
+        cursor: !clicked&&turn===user?'pointer':'default'
     }
     const setClicked = (value) => {
         setBlocks((prevBlocks) => {

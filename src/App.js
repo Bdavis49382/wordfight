@@ -5,7 +5,7 @@ import LoginScreen from './LoginScreen';
 import SelectionScreen from './SelectionScreen';
 import Home from './Home';
 import Rules from './Rules';
-import {collection,doc,deleteDoc,onSnapshot,query} from 'firebase/firestore';
+import {collection,onSnapshot,query, where, orderBy, or, Timestamp, and} from 'firebase/firestore';
 import {db} from './firebase';
 import { getAuth, onAuthStateChanged} from "firebase/auth";
 const screenStyle = {
@@ -25,17 +25,20 @@ function App() {
     if (userAuth && user === '') {
       const atSign = userAuth.email.indexOf("@")
       setUser(userAuth.email.slice(0,atSign).trim().toLowerCase());
+      loadGames(userAuth.email.slice(0,atSign).trim().toLowerCase())
       setScreen('selection')
     } else if (user !== '' && userAuth === undefined) {
       setUser('')
       setScreen('home')
     }
-    console.log('user is logged in: ',user)
   })
   
-  const loadGames = () => {
+  const loadGames = (u) => {
     try {
-      const q = query(collection(db,'games'))
+      const yesterday = new Date()
+      yesterday.setDate(new Date().getDate() - 1);
+      const dayAgo = Timestamp.fromDate(yesterday)
+      const q = query(collection(db,'games'), and(where("players", "array-contains", u), or(where("finished","==",false), where('lastMove','>=',dayAgo))), orderBy('lastMove','desc'))
       onSnapshot(q, (querySnapshot) => {
           const dbGames = [];
           querySnapshot.forEach((doc) => {
@@ -44,33 +47,16 @@ function App() {
           setGames(dbGames);
       })
     }
-    catch {
-      alert('unable to connect to firebase');
+    catch (e) {
+      console.log(e)
+      alert('unable to connect to firebase: ' + e);
     }
 
   }
-  const removeOldGames = () => {
-    games.forEach(game => {
-      if (game.lastMove == null) {
-        console.log('cannot delete game, null lastMove')
-        return;
-      }
-      const lastMove = game.lastMove.toDate().getTime();
-      const now = new Date();
-      const minutes = Math.floor((now-lastMove)/60000)
-      if (minutes > 1440 && (game.redScore >= 10 || game.blueScore >= 10)) {
-        deleteDoc(doc(db,'games',game.id));
-        console.log('deleting ',game)
-      }
-    })
-  }
   
   useEffect(() => {
-    loadGames();
+    loadGames(user);
   },[])
-  useEffect(() => {
-    removeOldGames();
-  },[games])
   switch (screen) {
     case 'home':
       return <Home 
@@ -101,6 +87,7 @@ function App() {
         <GameScreen 
           user={user} 
           game={game} 
+          setGame={setGame}
           gameId={gameId} 
           style={screenStyle}
           setGameId={setGameId} 

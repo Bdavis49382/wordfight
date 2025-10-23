@@ -1,5 +1,6 @@
 import { initializeApp} from "firebase/app";
 import { getFirestore} from 'firebase/firestore';
+import { getFunctions, httpsCallable } from "firebase/functions";
 // import firebase from 'firebase/compat/app';
 
 const firebaseConfig = {
@@ -15,4 +16,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
-export {db};
+const functions = getFunctions(app);
+const createGame = httpsCallable(functions, 'create_game')
+const submitWord = httpsCallable(functions, 'submit_word')
+export {db, createGame, submitWord};

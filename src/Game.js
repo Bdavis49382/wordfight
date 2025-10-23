@@ -10,14 +10,14 @@ export default function Game({game,user,onClick,time}) {
         cursor:'pointer',
         opacity:game.turn===user?'100%':'60%',
         color:'black'}
-    const blueWon = game.blueScore >= 10 
-    const redWon = game.redScore >= 10 
+    const userIndex = game.players[0] === user ? 0 : 1;
+    const won = game.scores[userIndex] >= 10 
 
-    if (blueWon || redWon) {
+    if (game.finished) {
         return (
             <div onClick={onClick} style={{...gameStyle,backgroundColor:'gray',opacity:'70%'}}>
                 <div><b>{opponent}</b></div>
-                <div>{game.players[blueWon?1:0]} Won</div>
+                <div>{won ? 'You' : 'They'} Won</div>
                 <div>Finished {time}</div>
             </div>
         )

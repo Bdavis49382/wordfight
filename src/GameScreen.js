@@ -1,172 +1,53 @@
-import React,{useEffect, useState} from 'react';
+import { useState} from 'react';
 import './App.css';
 import BlockGrid from './BlockGrid.js';
-import {setDoc, updateDoc,doc, onSnapshot, serverTimestamp} from 'firebase/firestore';
 import Button from './Button';
-import {db} from './firebase';
+import {submitWord} from './firebase';
 const colors = {'solidBlue':'#0e75e3','blue':'#5ba3f0','none':'white','red':'#db4d4d','solidRed':'#d10d0d'}
-function GameScreen({style,user,game,setGameId,gameId,setScreen}) {
-  const [players,setPlayers] = useState(game.players);
-  const [turn,setTurn] = useState(game.turn);
+function GameScreen({style,user,game,setGameId,gameId,setScreen,setGame}) {
   const [word,setWord] = useState([]);
-  const [usedWords,setUsedWords] = useState(game.usedWords);
-  const [message,setMessage] = useState('Click on Letters to Form a Word!');
   const [blocks,setBlocks] = useState(game.blocks);
-  const [blueScore,setBlueScore] = useState(game.blueScore);
-  const [redScore,setRedScore] = useState(game.redScore);
-  // const [over,setOver] = useState(false);
-  const loadGame = () => {
-    onSnapshot(doc(db,'games',gameId), (doc) => {
-      setTurn(doc.data().turn);
-      setUsedWords(doc.data().usedWords);
-      setBlocks(doc.data().blocks);
-      setBlueScore(doc.data().blueScore);
-      setRedScore(doc.data().redScore);
-    })
-  }
-  const updateScore = () => {
-    const blue = blocks.map(block => block.allegiance==='solidBlue'?1:0).reduce((a,b) => a + b);
-    const red = blocks.map(block => block.allegiance==='solidRed'?1:0).reduce((a,b) => a + b);
-    setBlueScore(blue);
-    setRedScore(red);
-    if (red >= 10 || blue >= 10) {
-      const winner = blue > red?1:0;
-      setMessage(players.indexOf(user) === winner?'You Win':'You Lose');
-      saveGame(blue,red);
-    }
-    else if(turn === user){
-        setMessage('Click on Letters to Form a Word');
-    }
-    else {
-      saveGame(blue,red);
-      setMessage('Waiting for your opponent...');
-    }
-  }
-    const neighborsAre = (neighbors) => {
-        if (neighbors.every((neighbor) => neighbor.allegiance==='blue'|| neighbor.allegiance ==='solidBlue')) {
-            return 'blue';
-        }
-        else if (neighbors.every((neighbor) => neighbor.allegiance==='red'|| neighbor.allegiance ==='solidRed')) {
-            return 'red';
-        }
-        else {
-            return '';
-        }
-    }
-    const checkNeighbors = (block) => {
-        const x = (otherBlock) => otherBlock.index%5;
-        const y = (otherBlock) => Math.floor(otherBlock.index/5);
-        const neighbors = blocks.filter((potentialNeighbor) => {
-            const differenceY = Math.abs(y(potentialNeighbor)-y(block));
-            const differenceX = Math.abs(x(potentialNeighbor)-x(block));
-            return   ((x(potentialNeighbor) === x(block))&&(differenceY === 1)) || ((y(potentialNeighbor)===y(block))&&(differenceX === 1));
-        }
-        )
-        const playerColor = turn===players[1]?'blue':'red';
-        const solidColor = turn===players[1]?'solidBlue':'solidRed';
-        const opponentColor = playerColor === 'red'?'blue':'red';
-        const opponentSolidColor = playerColor === 'red'?'solidBlue':'solidRed';
-        const neighborsColor = neighborsAre(neighbors);
-        
-        if(neighborsColor === playerColor && block.allegiance===playerColor){
-          block.allegiance = solidColor;
-          if (playerColor === 'blue') {
-            setBlueScore((score) => score + 1);
-          }
-          else {
-            setRedScore((score) => score + 1);
-          }
-        }
-        else if ((neighborsColor === '' || neighborsColor === playerColor) && block.allegiance===opponentSolidColor) {
-            block.allegiance = opponentColor;
-            if (playerColor === 'blue') {
-              setRedScore((score) => score -1);
-            }
-            else {
-              setBlueScore((score) => score - 1);
-            }
-        }
-        return block;
-    }
-  const saveGame = (blue,red) => {
-      try {
-        updateDoc(doc(db,'games',game.id),{blocks,players,turn,usedWords,blueScore:blue,redScore:red})
-      }
-      catch (err) {
-        console.log('firebase error in setting document');
-      }
-  }
+  const over = game.scores[0] >= 10 || game.scores[1] >= 10
+  const winner = game.scores[0] > game.scores[1] ? game.players[0] : game.players[1]
+  const message = over ? (winner === user ? 'You Win' : 'You Lose') : (game.turn === user ? 'Click on Letters to Form a Word' : 'Waiting for your opponent...')
+
   const endTurn = async () => {
-    const stringWord = word.map((block) => block.letter).join('')
-    if(await verifyWord(stringWord)){
-        await setUsedWords((prevUsedWords) => [...prevUsedWords,stringWord])
-        setTurn((turn) => turn===players[0]?players[1]:players[0]);
+    if (word.length > 0) {
+      try {
+        const newGame = await submitWord({"word":word,"gameId":gameId})
         setWord([]);
-        const newBlocks = colorBlocks().map(checkNeighbors);
-        updateDoc(doc(db,'games',gameId), {"blocks":newBlocks,'lastMove':serverTimestamp()})
-        
+        setGame(newGame.data)
+        setBlocks(newGame.data.blocks)
+      } catch (e) {
+        alert(e.message.replace('FirebaseError: ',''))
+      }
+    } else {
+      alert('No word was submitted!')
     }
-    else {
-        setMessage('That was not a valid word');
-    }
-    
   }
 
-  const colorBlocks = () => {
-
-    const solidEnemyColor = turn===players[1]?'solidRed':'solidBlue';
-    const newBlocks = blocks.map((block) => {
-      const playerColor = turn===players[1]?'blue':'red';
-      if (block.clicked && block.allegiance !== solidEnemyColor) {
-        block.allegiance = playerColor;
-      }
-      block.clicked = false;
-      return block;
-    })
-    return newBlocks;
-  }
-  useEffect(() => {
-    loadGame();
-  },[])
-  useEffect(() => {
-    updateScore();
-  },[turn,user])
-  async function verifyWord(word) {
-    
-    let url = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
-    const response = await fetch(url);
-    if (response.ok) {
-      if (usedWords.includes(word)) {
-        alert(word + 'has already been played this game.');
-        return false;
-      }
-      else {
-        return true;
-      }
-    }
-    else {
-        return false
-    }
-  }
   return (
     <div className="GameScreen" style={style}>
-      <h3 className='userName' style={{color:user === players[1]?colors.blue:colors.red}}>{user}</h3> 
-      <h3 className='turn' style={{color:user === players[1]?colors.red:colors.blue}}>{players[0] === user ?players[1]:players[0]}</h3>
+      <h3 className='userName' style={{color:user === game.players[1]?colors.blue:colors.red}}>{user}</h3> 
+      <h3 className='turn' style={{color:user === game.players[1]?colors.red:colors.blue}}>{game.players[0] === user ?game.players[1]:game.players[0]}</h3>
         <BlockGrid 
-            turn={turn} 
+            turn={game.turn} 
             setWord={setWord} 
+            user={user}
             blocks={blocks} 
             setBlocks={setBlocks} 
-            players={players} 
-            usedWords={usedWords}/>
+            players={game.players} 
+            usedWords={game.usedWords}/>
         <div style={{width:'50%',margin:'10px auto'}}>
-          <div style={{color:colors.blue,fontSize:'150%',float:user===players[1]?'left':'right'}}>{blueScore}</div><div style={{color:colors.red,fontSize:'150%',textAlign:user===players[0]?'left':'right'}}>{redScore}</div>
+          <div style={{color:colors.blue,fontSize:'150%',float:user===game.players[1]?'left':'right'}}>{game.scores[1]}</div><div style={{color:colors.red,fontSize:'150%',textAlign:user===game.players[0]?'left':'right'}}>{game.scores[0]}</div>
         <h3 style={{textAlign:'center',color:'gray'}}>{message}</h3>
         </div>
         <h2 style={{textAlign:'center'}}>{word.map((block) => block.letter).join(' ')}</h2>
-        {(turn === user && blueScore < 10 && redScore < 10) && <Button onClick={endTurn} text="Submit"></Button>}
-        <Button onClick={() => {setGameId('');setScreen('selection')}} text="Back to Games"/>
-        {usedWords.length>0&&<h4 style={{color:'gray'}}>Last Word: {usedWords[usedWords.length-1].toLowerCase()}</h4>}
+        <div style={{display:'flex',flexDirection:'row', justifyContent:'center'}}>
+          {(game.turn === user && !over) && <Button onClick={endTurn} text="Submit"></Button>}
+          <Button onClick={() => {setGameId('');setScreen('selection')}} text="Back to Games" style={{marginLeft:10}}/>
+        </div>
+        {game.usedWords.length>0&&<h4 style={{color:'gray'}}>Last Word: {game.usedWords[game.usedWords.length-1].toLowerCase()}</h4>}
     </div>
   );
 }
