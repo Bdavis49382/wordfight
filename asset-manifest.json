@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/wordfight/static/css/main.d38867ab.css",
-    "main.js": "/wordfight/static/js/main.f41af985.js",
+    "main.css": "/wordfight/static/css/main.fc0ec988.css",
+    "main.js": "/wordfight/static/js/main.5b4e4b2b.js",
     "static/js/787.f11733a3.chunk.js": "/wordfight/static/js/787.f11733a3.chunk.js",
     "index.html": "/wordfight/index.html",
-    "main.d38867ab.css.map": "/wordfight/static/css/main.d38867ab.css.map",
-    "main.f41af985.js.map": "/wordfight/static/js/main.f41af985.js.map",
+    "main.fc0ec988.css.map": "/wordfight/static/css/main.fc0ec988.css.map",
+    "main.5b4e4b2b.js.map": "/wordfight/static/js/main.5b4e4b2b.js.map",
     "787.f11733a3.chunk.js.map": "/wordfight/static/js/787.f11733a3.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.d38867ab.css",
-    "static/js/main.f41af985.js"
+    "static/css/main.fc0ec988.css",
+    "static/js/main.5b4e4b2b.js"
   ]
 }
