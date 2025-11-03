@@ -1,6 +1,6 @@
 export default function Button({onClick,text,style}) {
     const defaultStyle = {
-        border:'1.5px solid black',
+        border:'1.7px solid black',
         borderRadius: '5px',
         backgroundColor:'white',
         color:'black',
