@@ -1,0 +1,11 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.wordfightmobile",
+    "sha256_cert_fingerprints":
+    ["05:2C:A2:94:E1:83:88:EF:46:0B:18:65:A2:64:34:73:C9:37:30:5C:9C:62:A9:9E:F7:F0:6E:17:FA:7E:5D:17",
+    "7B:B7:4E:5E:96:F4:7C:AA:52:F1:FB:95:9A:0D:23:F4:56:75:44:25:23:AC:F4:7A:6F:46:3D:4B:6A:5F:49:2A"
+]
+  }
+}]
